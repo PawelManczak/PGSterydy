@@ -9,8 +9,10 @@ def get_categories_html() -> BeautifulSoup:
 def find_categories(soup: BeautifulSoup):
     category_html = soup.find_all("div", {"class": "name_cat"})
     for category in category_html:
-        print(category)
-
+        category_name = category.text
+        print(category_name)
+        category_link = category.contents[0]['href']
+        print(category_link)
 
 def main():
     print("Hello, we are gonna steal some data")
