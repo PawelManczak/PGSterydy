@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import os
 import pandas as pd
+import multiprocessing
 
 def get_categories_html() -> BeautifulSoup:
     res = requests.get('https://euro-sterydy.pl/sterydy-sklep/')
@@ -33,12 +34,17 @@ def save_to_file(file_name, data):
     file_path = os.path.join(os.path.dirname(curr_dir), "scraper data", file_name)
     data.to_csv(file_path, ';')
 
+def __print_category_products(_, category_data):
+    html_data = get_category_html(category_data["Adres"])
+    get_category_products(html_data)
+
 def main():
     print("Hello, we are gonna steal some data")
     soup = get_categories_html()
     category_data = find_categories(soup)
     save_to_file("categories.csv", category_data)
-    for idx, category in category_data.iterrows():
-        html_data = get_category_html(category["Adres"])
-        get_category_products(html_data)
-main()
+    with multiprocessing.Pool() as pool:
+        pool.starmap(__print_category_products, category_data.iterrows())
+
+if __name__ == '__main__':
+    main()
