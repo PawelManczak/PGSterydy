@@ -3,10 +3,15 @@ import requests
 import os
 import pandas as pd
 import multiprocessing
+import concurrent.futures
+
+
+def __url_to_soup(url: str) -> BeautifulSoup:
+    res = requests.get(url)
+    return BeautifulSoup(res.content, 'html.parser')
 
 def get_categories_html() -> BeautifulSoup:
-    res = requests.get('https://euro-sterydy.pl/sterydy-sklep/')
-    return BeautifulSoup(res.content, 'html.parser')
+    return __url_to_soup('https://euro-sterydy.pl/sterydy-sklep/')
 
 
 def find_categories(soup: BeautifulSoup) -> pd.DataFrame:
@@ -19,16 +24,17 @@ def find_categories(soup: BeautifulSoup) -> pd.DataFrame:
     return pd.DataFrame.from_records(categories, columns=['Nazwa', 'Adres'])
 
 def get_category_html(category_link) -> BeautifulSoup:
-    res = requests.get(category_link)
-    return BeautifulSoup(res.content, 'html.parser')
+    return __url_to_soup(category_link)
+
 
 def get_category_products(category_html: BeautifulSoup):
     products = category_html.find_all("div", {"class": "item-img-info"})
     products = map(lambda p : p.a, products)
+    product_data = []
     for product in products:
-        print(product['href'])
+        product_data.append([product['href'], product.img["data-original"]])
+    return pd.DataFrame.from_records(product_data, columns=['Adres', "Obraz_mały"])
 
-# Save to a .csv, each subarray of data being a separate record
 def save_to_file(file_name, data):
     curr_dir = os.path.abspath(os.getcwd()).split()[0]
     file_path = os.path.join(os.path.dirname(curr_dir), "scraper data", file_name)
@@ -38,13 +44,46 @@ def __print_category_products(_, category_data):
     html_data = get_category_html(category_data["Adres"])
     get_category_products(html_data)
 
+def initial_product_data(_, category_data):
+    html_data = get_category_html(category_data["Adres"])
+    product_data = get_category_products(html_data)
+    product_data["Kategoria"] = category_data["Nazwa"]
+    return product_data
+
+def extended_product_data(initial_product_data) -> pd.DataFrame:
+    initial_product_data = initial_product_data[1]
+    soup = __url_to_soup(initial_product_data["Adres"])
+    big_image = soup.find("img", {"class": "img-responsive woocommerce-main-image"})["data-large_image"]
+    product_name = soup.find("h1", {"class": "product_title entry-title"}).text
+    price = soup.find_all("span", {"class": "woocommerce-Price-amount amount"})[1].bdi.contents[0]
+    print("Processing: " + product_name)
+    description = soup.find("div", {"class": "rte"})
+    if description is None:
+        description = ""
+    else:
+        description = description.text
+    return pd.DataFrame(data={"Nazwa": [product_name], "Kategoria": [initial_product_data["Kategoria"]], "Cena": [price], "Opis": [description], "Duzy obraz": [big_image], "Maly obraz":  [initial_product_data["Obraz_mały"]], "Link": [initial_product_data["Adres"]]})
+
+
 def main():
-    print("Hello, we are gonna steal some data")
+    print("Fetching categories...")
     soup = get_categories_html()
     category_data = find_categories(soup)
     save_to_file("categories.csv", category_data)
+    print("Saved categories to categories.csv")
+    print("Fetching product list...")
+    products = pd.DataFrame()
     with multiprocessing.Pool() as pool:
-        pool.starmap(__print_category_products, category_data.iterrows())
+        product_frames = pool.starmap(initial_product_data, category_data.iterrows())
+        products = pd.concat(product_frames, ignore_index=True)
+    print("Done. Getting product details...")
+    product_data = pd.DataFrame()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
+        records = pool.map(extended_product_data, products.iterrows())
+        product_data = pd.concat(records, ignore_index=True)
+    save_to_file("products.csv", product_data)
+        
+
 
 if __name__ == '__main__':
     main()
