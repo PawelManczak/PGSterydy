@@ -8,7 +8,7 @@ def get_categories_html() -> BeautifulSoup:
     return BeautifulSoup(res.content, 'html.parser')
 
 
-def find_categories(soup: BeautifulSoup):
+def find_categories(soup: BeautifulSoup) -> pd.DataFrame:
     category_html = soup.find_all("div", {"class": "name_cat"})
     categories = []
     for category in category_html:
@@ -16,8 +16,16 @@ def find_categories(soup: BeautifulSoup):
         category_link = category.contents[0]['href']
         categories.append([category_name, category_link])
     return pd.DataFrame.from_records(categories, columns=['Nazwa', 'Adres'])
-    
 
+def get_category_html(category_link) -> BeautifulSoup:
+    res = requests.get(category_link)
+    return BeautifulSoup(res.content, 'html.parser')
+
+def get_category_products(category_html: BeautifulSoup):
+    products = category_html.find_all("div", {"class": "item-img-info"})
+    products = map(lambda p : p.a, products)
+    for product in products:
+        print(product['href'])
 
 # Save to a .csv, each subarray of data being a separate record
 def save_to_file(file_name, data):
@@ -29,8 +37,8 @@ def main():
     print("Hello, we are gonna steal some data")
     soup = get_categories_html()
     category_data = find_categories(soup)
-    print(category_data)
     save_to_file("categories.csv", category_data)
-
-
+    for idx, category in category_data.iterrows():
+        html_data = get_category_html(category["Adres"])
+        get_category_products(html_data)
 main()
