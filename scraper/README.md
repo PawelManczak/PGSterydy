@@ -18,16 +18,16 @@ Csv files with all the data collected by the scraper are located in the sibling 
 
 ### categories.csv
 Contains information regarding available product categories:
-    * Nazwa - name of the category
-    * Adres - hyperlink to the category page
+- Nazwa - name of the category
+- Adres - hyperlink to the category page
 
 
 ### products.csv
-Contains all the relevant product information:
-    * Nazwa - product name
-    * Kategoria - name of the category
-    * Cena - price of the product in PLN
-    * Opis - product description in plaintext
-    * Duzy obraz - picture of the product in gallery format
-    * Mały obraz - product thumbnail
-    * Link - hyperlink to the product page
+Contains all the relevant product information:   
+* Nazwa - product name
+* Kategoria - name of the category
+* Cena - price of the product in PLN
+* Opis - product description in plaintext
+* Duzy obraz - picture of the product in gallery format
+* Mały obraz - product thumbnail
+* Link - hyperlink to the product page
