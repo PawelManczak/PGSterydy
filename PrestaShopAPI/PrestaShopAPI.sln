@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrestaShopAPI", "PrestaShopAPI\PrestaShopAPI.csproj", "{DA5F8F06-7B7E-4223-B2CB-35DB227890A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA5F8F06-7B7E-4223-B2CB-35DB227890A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA5F8F06-7B7E-4223-B2CB-35DB227890A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA5F8F06-7B7E-4223-B2CB-35DB227890A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA5F8F06-7B7E-4223-B2CB-35DB227890A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0FA11EA2-158A-4B23-98C1-7CA6794775E2}
+	EndGlobalSection
+EndGlobal
