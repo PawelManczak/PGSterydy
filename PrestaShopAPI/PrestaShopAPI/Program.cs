@@ -6,30 +6,31 @@ using CsvHelper;
 class Program
 {
     static void Main()
-    {   
-        const string categoriesPath = "../../../../../scraper data/categories.csv";
-        const string productsPath = "../../../../../scraper data/products.csv";
+    {
+        WebApiService tester = new WebApiService();
+        tester.deleteAllProducts();
+        tester.deleteAllCategories();
 
-        // Read CSV file using CsvHelper
+        const string categoriesPath = "../../../../../scraper data/categories.csv";
+        const string productsPath = "../../../../../scraper data/products_sample.csv";
+
+        // Read CSV files
         List<Category> categories = CsvParser.ReadCsvFile<Category>(categoriesPath);
         List<Product> products = CsvParser.ReadCsvFile<Product>(productsPath);
 
         // Display the data
         foreach (var row in categories)
         {
-            Console.WriteLine($"Column1: {row.id}, Column2: {row.name}, Column3: {row.url}");
+            tester.addCategory(row, null);
+            Console.WriteLine($"Id: {row.id}, Nazwa: {row.name}, Url: {row.url}");
         }
 
         foreach (var row in products)
         {
-            Console.WriteLine($"Column1: {row.id}, Column2: {row.name}, Column3: {row.url}");
+            tester.addProduct(row);
+            Console.WriteLine($"Id: {row.id}, Nazwa: {row.name}, Url: {row.url}");//, Price: {Decimal.Parse(row.price)}");
         }
 
-
-        TestWebApi tester = new TestWebApi();
-        //tester.addCategory(categories[0]);
-        //tester.test();
-    }
-
+    }    
 
 }
