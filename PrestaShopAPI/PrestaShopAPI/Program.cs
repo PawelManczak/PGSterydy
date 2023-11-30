@@ -10,7 +10,6 @@ class Program
         WebApiService tester = new WebApiService();
         tester.deleteAllProducts();
         tester.deleteAllCategories();
-
         const string categoriesPath = "../../../../../scraper data/categories.csv";
         const string productsPath = "../../../../../scraper data/products_sample.csv";
 
@@ -30,7 +29,7 @@ class Program
             tester.addProduct(row);
             Console.WriteLine($"Id: {row.id}, Nazwa: {row.name}, Url: {row.url}");//, Price: {Decimal.Parse(row.price)}");
         }
-
+        
     }    
 
 }
