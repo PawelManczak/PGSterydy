@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "zLC0eXcmokT4ENVHLXuxZeFN25cAtSlJAPWEvdFfMA6DEQS9QhlV3LPVT+RKRrMArpzu6vrKgQmLgf15ziq4kw==",
+  "success": true,
+  "projectFilePath": "F:\\PROJEKTY\\Biznes_Elektroniczny\\Projekt\\PGSterydy\\PrestaShopAPI\\PrestaShopAPI\\PrestaShopAPI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\adamn\\.nuget\\packages\\csvhelper\\30.0.1\\csvhelper.30.0.1.nupkg.sha512",
+    "C:\\Users\\adamn\\.nuget\\packages\\prestasharp\\1.2.9\\prestasharp.1.2.9.nupkg.sha512",
+    "C:\\Users\\adamn\\.nuget\\packages\\restsharp\\106.11.4\\restsharp.106.11.4.nupkg.sha512"
+  ],
+  "logs": []
+}
