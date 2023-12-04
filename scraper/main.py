@@ -62,7 +62,7 @@ def extended_product_data(initial_product_data) -> pd.DataFrame:
         description = ""
     else:
         description = description.text
-    return pd.DataFrame(data={"Nazwa": [product_name], "Kategoria": [initial_product_data["Kategoria"]], "Cena": [price], "Opis": [description], "Duzy obraz": [big_image], "Maly obraz":  [initial_product_data["Obraz_mały"]], "Link": [initial_product_data["Adres"]]})
+    return pd.DataFrame(data={"name": [product_name], "Kategoria": [initial_product_data["Kategoria"]], "price": [price], "description": [description], "bigImgUrl": [big_image], "smallImgUrl":  [initial_product_data["Obraz_mały"]], "url": [initial_product_data["Adres"]]})
 
 
 def main():
