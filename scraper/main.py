@@ -56,7 +56,7 @@ def extended_product_data(initial_product_data) -> pd.DataFrame:
     soup = __url_to_soup(initial_product_data["Adres"])
     big_image = soup.find("img", {"class": "img-responsive woocommerce-main-image"})["data-large_image"]
     product_name = soup.find("h1", {"class": "product_title entry-title"}).text
-    price = soup.find_all("span", {"class": "woocommerce-Price-amount amount"})[1].bdi.contents[0]
+    price = soup.find_all("span", {"class": "woocommerce-Price-amount amount"})[1].bdi.contents[0].replace(",", "")
     print("Processing: " + product_name)
     description = soup.find("div", {"class": "rte"})
     if description is None:
