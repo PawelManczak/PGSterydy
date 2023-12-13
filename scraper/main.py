@@ -21,7 +21,7 @@ def find_categories(soup: BeautifulSoup) -> pd.DataFrame:
         category_name = category.text
         category_link = category.contents[0]['href']
         categories.append([category_name, category_link])
-    return pd.DataFrame.from_records(categories, columns=['Nazwa', 'Adres'])
+    return pd.DataFrame.from_records(categories, columns=['name', 'url'])
 
 def get_category_html(category_link) -> BeautifulSoup:
     return __url_to_soup(category_link)
@@ -45,9 +45,9 @@ def __print_category_products(_, category_data):
     get_category_products(html_data)
 
 def initial_product_data(_, category_data):
-    html_data = get_category_html(category_data["Adres"])
+    html_data = get_category_html(category_data["url"])
     product_data = get_category_products(html_data)
-    product_data["Kategoria"] = category_data["Nazwa"]
+    product_data["Kategoria"] = category_data["name"]
     return product_data
 
 def extended_product_data(initial_product_data) -> pd.DataFrame:
@@ -55,20 +55,25 @@ def extended_product_data(initial_product_data) -> pd.DataFrame:
     soup = __url_to_soup(initial_product_data["Adres"])
     big_image = soup.find("img", {"class": "img-responsive woocommerce-main-image"})["data-large_image"]
     product_name = soup.find("h1", {"class": "product_title entry-title"}).text
-    price = soup.find_all("span", {"class": "woocommerce-Price-amount amount"})[1].bdi.contents[0]
+    price = soup.find_all("span", {"class": "woocommerce-Price-amount amount"})[1].bdi.contents[0].replace(",","")
     print("Processing: " + product_name)
     description = soup.find("div", {"class": "rte"})
     if description is None:
         description = ""
     else:
         description = description.text
+<<<<<<< Updated upstream
     return pd.DataFrame(data={"Nazwa": [product_name], "Kategoria": [initial_product_data["Kategoria"]], "Cena": [price], "Opis": [description], "Duzy obraz": [big_image], "Maly obraz":  [initial_product_data["Obraz_mały"]], "Link": [initial_product_data["Adres"]]})
+=======
+    return pd.DataFrame(data={"name": [product_name], "category": [initial_product_data["Kategoria"]], "price": [price], "description": [description], "bigImgUrl": [big_image], "smallImgUrl":  [initial_product_data["Obraz_mały"]], "url": [initial_product_data["Adres"]]})
+>>>>>>> Stashed changes
 
 
 def main():
     print("Fetching categories...")
     soup = get_categories_html()
     category_data = find_categories(soup)
+    category_data.iloc[0,0] = "id"
     save_to_file("categories.csv", category_data)
     print("Saved categories to categories.csv")
     print("Fetching product list...")
@@ -81,6 +86,7 @@ def main():
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
         records = pool.map(extended_product_data, products.iterrows())
         product_data = pd.concat(records, ignore_index=True)
+    product_data.iloc[0, 0] = "id"
     save_to_file("products.csv", product_data)
         
 
