@@ -1,1 +1,4 @@
 .DS_Store
+PrestaShopAPI/PrestaShopAPI/obj/*
+PrestaShopAPI/.vs/*
+.idea/*
