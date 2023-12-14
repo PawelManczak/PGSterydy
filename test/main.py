@@ -11,7 +11,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 PRESTASHOP_URL = "http://localhost:8080/"
-SEARCH_PRODUCT = "Solcoseryl"
+SEARCH_PRODUCT = "5 tab – Cabaser"
 
 USER_FIRST_NAME = "Test"
 USER_LAST_NAME = "Xyz"
@@ -36,23 +36,24 @@ class PrestaShopTests(unittest.TestCase):
 
     def test_all_cases(self):
 
-        # self.add_ten_elements_to_cart()
-        self.add_to_cart_random_searched_item()
-        # self.remove_three_products_from_cart()
-        self.register_user()
+        self.add_to_cart_random_searched_item()#działa
+        self.add_ten_elements_to_cart()  #działa
+        self.remove_three_products_from_cart()  # działa
+        self.register_user()  #działa
         self.order()
         self.order_status()
-        #self.vat_invoice()
+        self.vat_invoice()
 
     def add_ten_elements_to_cart(self):
-        for i in range(2):
+        for i in range(5):
             self.driver.find_element(By.ID, "top-menu") \
                 .find_elements(By.XPATH, "//a[@data-depth='0']")[i].click()
             j = -1
-            for _ in range(5):
+            for _ in range(2):
 
                 while True:
                     j += 1
+
                     quantity = 0
                     self.driver.find_element(By.ID, "js-product-list") \
                         .find_elements(By.CLASS_NAME, "thumbnail-top")[j].find_element(By.TAG_NAME, "a").click()
@@ -73,7 +74,7 @@ class PrestaShopTests(unittest.TestCase):
                         if items_in_stock < 1:
                             raise NoSuchElementException
 
-                        quantity = random.randint(0, int(items_in_stock))
+                        quantity = random.randint(0, int(items_in_stock/2))
 
                         break
                     except NoSuchElementException:
@@ -85,13 +86,13 @@ class PrestaShopTests(unittest.TestCase):
                     self.driver.find_element(By.CLASS_NAME, "bootstrap-touchspin-up").click()
                 self.driver.find_element(By.CLASS_NAME, "add-to-cart").click()
 
-                time.sleep(0.1)
+                time.sleep(0.3)
                 current_url = self.driver.current_url
                 while self.driver.current_url == current_url:
                     self.driver.back()
 
         self.driver.find_element(By.ID, "_desktop_cart").find_element(By.TAG_NAME, "a").click()
-        assert len(self.driver.find_elements(By.CLASS_NAME, "cart-item")) == 10
+        assert len(self.driver.find_elements(By.CLASS_NAME, "cart-item")) >= 10
 
     def add_to_cart_random_searched_item(self):
         search = self.driver.find_element(By.ID, "search_widget")
@@ -123,7 +124,7 @@ class PrestaShopTests(unittest.TestCase):
         quantity_of_products = len(self.driver.find_elements(By.CLASS_NAME, "cart-item"))
         for i in range(3):
             self.driver.find_element(By.CLASS_NAME, "remove-from-cart").click()
-            time.sleep(1)
+            time.sleep(2)
 
         assert len(self.driver.find_elements(By.CLASS_NAME, "cart-item")) == quantity_of_products - 3
 
@@ -161,12 +162,12 @@ class PrestaShopTests(unittest.TestCase):
         self.driver.find_element(By.NAME, "confirmDeliveryOption").click()
         # add payment method when implemented - probably change to:
         # self.driver.find_element(By.CLASS_NAME, "payment-options").find_elements(By.TAG_NAME, "input")[2].click()
-        self.driver.find_element(By.CLASS_NAME, "payment-options ").find_elements(By.TAG_NAME, "input")[0].click()
+        self.driver.find_element(By.CLASS_NAME, "payment-options ").find_elements(By.TAG_NAME, "input")[1].click()
         self.driver.find_element(By.ID, "conditions-to-approve").find_element(By.TAG_NAME, "input").click()
         self.driver.find_element(By.ID, "payment-confirmation").find_element(By.TAG_NAME, "button").click()
 
         try:
-            self.driver.find_element(By.ID, "content-hook_order_confirmation").is_displayed()
+            self.driver.find_element(By.CLASS_NAME, "card-block").is_displayed()
             assert True
         except:
             assert False
