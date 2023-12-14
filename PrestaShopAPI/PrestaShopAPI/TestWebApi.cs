@@ -12,6 +12,8 @@ using System.Xml.Linq;
 using Bukimedia.PrestaSharp.Entities;
 using System.Diagnostics;
 using System.Security.Principal;
+using Bukimedia.PrestaSharp.Entities.FilterEntities;
+using System.Diagnostics.Metrics;
 
 class WebApiService
 {
@@ -23,7 +25,9 @@ class WebApiService
     CategoryFactory categoryFactory;
     LanguageFactory languageFactory;
     ImageFactory imageFactory;
-    StockAvailableFactory stockAvailableFactory; //tym będzie trzeba ustawiać ile sztuk produktów jest na stronie
+    StockAvailableFactory stockAvailableFactory;
+    DeliveryFactory deliveryFactory;
+    CarrierFactory carrierFactory;
 
     public WebApiService()
     {
@@ -36,13 +40,10 @@ class WebApiService
         languageFactory = new LanguageFactory(baseUrl, apiKey, password);
         stockAvailableFactory = new StockAvailableFactory(baseUrl, apiKey, password);
         imageFactory = new ImageFactory(baseUrl, apiKey, password);
+        deliveryFactory = new DeliveryFactory(baseUrl, apiKey, password);
+        carrierFactory = new CarrierFactory(baseUrl, apiKey, password);
     }
 
-
-    public void addManufacturer()
-    {
-        return;
-    }
 
     public void addCategory(Category category, Category? parent)
     {
@@ -89,8 +90,13 @@ class WebApiService
         //nazwa - name to lista języków, trzeba podać id języka i nazwę produktu
         newProduct.name.Add(new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, product.name));
 
-        // cena
-        newProduct.price = decimal.Parse(product.price);
+        // cena, /1.23 bo to cena przed podatkiem
+        newProduct.price = Math.Round((decimal.Parse(product.price) / 1.23m), 2);
+
+        // pokaz cene
+        newProduct.show_price = 1;
+
+        newProduct.minimal_quantity = 0;
 
         // id firmy - my nie mamy póki co
         //newProduct.id_manufacturer = 1;
@@ -116,11 +122,12 @@ class WebApiService
         // czy się wyświetla
         newProduct.active = 1;
 
-        //miejsce w kategorii
-        //newProduct.position_in_category = 1;
-
+        newProduct.available_for_order = 1;
+        
         //chuj wie
         newProduct.state = 1;
+
+        newProduct.id_tax_rules_group = 1;
 
         //opisy
         //newProduct.description_short.Add((new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, product.description)));
@@ -133,10 +140,18 @@ class WebApiService
             //add image
             addProductImage(newProduct.id.Value, product.bigImgUrl);
             addProductImage(newProduct.id.Value, product.smallImgUrl);
-
-            //TODO add stock
-            
+            addStock(newProduct);
         }
+    }
+
+    public void addStock(Bukimedia.PrestaSharp.Entities.product product)
+    {
+        Random random = new Random();
+       
+        long stockAvailableId = product.associations.stock_availables[0].id;
+        Bukimedia.PrestaSharp.Entities.stock_available myStockAvailable = stockAvailableFactory.Get(stockAvailableId);
+        myStockAvailable.quantity = random.Next(0, 10);  // Number of available products
+        stockAvailableFactory.Update(myStockAvailable);
     }
 
     public void addProductImage(long productId, string imgUrl)

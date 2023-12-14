@@ -1,4 +1,9 @@
+html/var/cache/*
 .DS_Store
+
 PrestaShopAPI/PrestaShopAPI/obj/*
 PrestaShopAPI/.vs/*
 .idea/*
+=======
+__pycache__
+

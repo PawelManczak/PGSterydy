@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import multiprocessing
 import concurrent.futures
+import subcategories as sc
 
 
 def __url_to_soup(url: str) -> BeautifulSoup:
@@ -55,14 +56,15 @@ def extended_product_data(initial_product_data) -> pd.DataFrame:
     soup = __url_to_soup(initial_product_data["Adres"])
     big_image = soup.find("img", {"class": "img-responsive woocommerce-main-image"})["data-large_image"]
     product_name = soup.find("h1", {"class": "product_title entry-title"}).text
-    price = soup.find_all("span", {"class": "woocommerce-Price-amount amount"})[1].bdi.contents[0]
+    price = soup.find_all("span", {"class": "woocommerce-Price-amount amount"})[1].bdi.contents[0].replace(",", "")
     print("Processing: " + product_name)
     description = soup.find("div", {"class": "rte"})
     if description is None:
         description = ""
     else:
         description = description.text
-    return pd.DataFrame(data={"Nazwa": [product_name], "Kategoria": [initial_product_data["Kategoria"]], "Cena": [price], "Opis": [description], "Duzy obraz": [big_image], "Maly obraz":  [initial_product_data["Obraz_mały"]], "Link": [initial_product_data["Adres"]]})
+    subcategory = sc.get_random_subcategory()
+    return pd.DataFrame(data={"name": [product_name], "category": [initial_product_data["Kategoria"]], "subcategory": [subcategory], "price": [price], "description": [description], "bigImgUrl": [big_image], "smallImgUrl":  [initial_product_data["Obraz_mały"]], "url": [initial_product_data["Adres"]]})
 
 
 def main():
