@@ -11,7 +11,7 @@ class Program
         tester.deleteAllProducts();
         tester.deleteAllCategories();
         const string categoriesPath = "../../../../../scraper data/categories.csv";
-        const string productsPath = "../../../../../scraper data/products_sample.csv";
+        const string productsPath = "../../../../../scraper data/products.csv";
 
         // Read CSV files
         List<Category> categories = CsvParser.ReadCsvFile<Category>(categoriesPath);
@@ -27,7 +27,7 @@ class Program
         foreach (var row in products)
         {
             tester.addProduct(row);
-            Console.WriteLine($"Id: {row.id}, Nazwa: {row.name}, Url: {row.url}");//, Price: {Decimal.Parse(row.price)}");
+            Console.WriteLine($"Id: {row.id}, Nazwa: {row.name}, Url: {row.url}");
         }
         
     }    
