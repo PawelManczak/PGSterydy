@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PrestaShopAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fdf017d6c5b0a3984c9452292a1622079eaedf11")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+08f30582d63723fd92e3ff4d738f9d77c847e985")]
 [assembly: System.Reflection.AssemblyProductAttribute("PrestaShopAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PrestaShopAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import multiprocessing
 import concurrent.futures
-import subcategories as sc
+
 
 
 def __url_to_soup(url: str) -> BeautifulSoup:
@@ -63,8 +63,7 @@ def extended_product_data(initial_product_data) -> pd.DataFrame:
         description = ""
     else:
         description = description.text
-    subcategory = sc.get_random_subcategory()
-    return pd.DataFrame(data={"name": [product_name], "category": [initial_product_data["Kategoria"]], "subcategory": [subcategory], "price": [price], "description": [description], "bigImgUrl": [big_image], "smallImgUrl":  [initial_product_data["Obraz_mały"]], "url": [initial_product_data["Adres"]]})
+    return pd.DataFrame(data={"name": [product_name], "category": [initial_product_data["Kategoria"]], "price": [price], "description": [description], "bigImgUrl": [big_image], "smallImgUrl":  [initial_product_data["Obraz_mały"]], "url": [initial_product_data["Adres"]]})
 
 
 def main():

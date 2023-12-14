@@ -48,61 +48,39 @@ class WebApiService
     public void addCategory(Category category, Category? parent)
     {
         Bukimedia.PrestaSharp.Entities.category newCategory = new Bukimedia.PrestaSharp.Entities.category();
-
-        // id nie dziala i tak po swojemu dodaje jako n+1 
-        //newCategory.id = category.id + 2;
-
-        //nazwa - name to lista języków, trzeba podać id języka i nazwę produktu
         newCategory.name.Add(new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, category.name));
-
-        // czy wyświetla się na stronie
         newCategory.active = 1;
-
-        // id kategorii nadrzędnej, jeśli parent == null to kategoria nadrzędna to strona główna (id == 2)
-        Bukimedia.PrestaSharp.Entities.AuxEntities.category parentCategory = new Bukimedia.PrestaSharp.Entities.AuxEntities.category();
+        newCategory.is_root_category = 0;
+        newCategory.id_shop_default = 1;
+        Dictionary<string, string> filter = new Dictionary<string, string>();
         if (parent == null) 
         {
-            parentCategory.id = 2;
-            newCategory.id_parent = 2;
+            filter.Add("name", "Home");
         }
         else
         {
-            parentCategory.id = parent.id;
-            newCategory.id_parent = parent.id;
+            filter.Add("name", parent.name);
         }
-        newCategory.associations.categories.Add(parentCategory);
-
-        //nie wiem, ale musi być bo wywala błąd
-        newCategory.link_rewrite.Add(new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, category.name));
-
-        //dodanie kategorii
-        categoryFactory.Add(newCategory);
+        Bukimedia.PrestaSharp.Entities.category parentCategory = categoryFactory.GetByFilter(filter, null, null).First();
+        if (parentCategory.id.HasValue) 
+        {
+            newCategory.id_parent = parentCategory.id.Value;
+            newCategory.associations.categories.Add(new Bukimedia.PrestaSharp.Entities.AuxEntities.category(parentCategory.id.Value));
+            newCategory.link_rewrite.Add(new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, category.name));
+            categoryFactory.Add(newCategory);
+        }
     }
 
     public void addProduct(Product product)
     {
-        // dodawanie produktu
         Bukimedia.PrestaSharp.Entities.product newProduct = new Bukimedia.PrestaSharp.Entities.product();
 
-        // id nie dziala i tak po swojemu dodaje jako n+1 
-        //newProduct.id = product.id;
-
-        //nazwa - name to lista języków, trzeba podać id języka i nazwę produktu
         newProduct.name.Add(new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, product.name));
 
-        // cena, /1.23 bo to cena przed podatkiem
         newProduct.price = Math.Round((decimal.Parse(product.price) / 1.23m), 2);
-
-        // pokaz cene
         newProduct.show_price = 1;
-
         newProduct.minimal_quantity = 0;
 
-        // id firmy - my nie mamy póki co
-        //newProduct.id_manufacturer = 1;
-
-
-        // kategoria, TODO zrobić to ładnie
         Dictionary<string, string> filter = new Dictionary<string, string>();
         filter.Add("name", product.category);
         Bukimedia.PrestaSharp.Entities.category category = categoryFactory.GetByFilter(filter, null, null).First();
@@ -124,20 +102,16 @@ class WebApiService
 
         newProduct.available_for_order = 1;
         
-        //chuj wie
         newProduct.state = 1;
 
         newProduct.id_tax_rules_group = 1;
 
-        //opisy
-        //newProduct.description_short.Add((new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, product.description)));
         newProduct.description.Add((new Bukimedia.PrestaSharp.Entities.AuxEntities.language(1, product.description)));
 
         newProduct = productFactory.Add(newProduct);
 
         if (newProduct.id.HasValue)
         {
-            //add image
             addProductImage(newProduct.id.Value, product.bigImgUrl);
             addProductImage(newProduct.id.Value, product.smallImgUrl);
             addStock(newProduct);
@@ -171,7 +145,8 @@ class WebApiService
         {
             if (product.id.HasValue)
             {
-                productFactory.Delete(product.id.Value);
+                try{productFactory.Delete(product.id.Value);}
+                catch{}  
             }  
         }
     }
@@ -181,9 +156,14 @@ class WebApiService
         List<Bukimedia.PrestaSharp.Entities.category> categories = categoryFactory.GetAll();
         foreach (Bukimedia.PrestaSharp.Entities.category category in categories)
         {
-            if (category.id.HasValue && category.id.Value > 2) // id == 1 i id == 2 to "baza" i "Strona Główna"
+            
+            if (category.id.HasValue && 
+                (!category.name.First().Value.Equals("Strona główna") 
+                && !category.name.First().Value.Equals("Baza") 
+                && !category.name.First().Value.Equals("Home")))
             {
-                categoryFactory.Delete(category.id.Value);
+                try{categoryFactory.Delete(category.id.Value);}
+                catch{}
             }
         }
     }
