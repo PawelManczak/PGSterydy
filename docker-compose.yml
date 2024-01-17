@@ -1,45 +1,40 @@
 version: '3'
 services:
-  mysql:
-    container_name: mysql
-    image: mysql:8
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: prestashop
-    volumes:
-      - ./db:/docker-entrypoint-initdb.d
   prestashop:
-    container_name: prestashop
-    image: prestashop/prestashop:1.7
+    image: kasiastachu/biznes_elektroniczny:1.6
     restart: unless-stopped
-    depends_on:
-      - mysql
     ports:
-      - 8080:80
-      - 8443:443
+      - 18875:443
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
     environment:
-      DB_SERVER: mysql
-      DB_NAME: prestashop
+      DB_SERVER: db
+      DB_NAME: BE_188756
       DB_USER: root
-      DB_PASSWD: admin
+      DB_PASSWD: student
       DB_PREFIX: _ps
-    volumes:
-      - ./html:/var/www/html
-      - ./html/cert.crt:/etc/ssl/cert.crt
-      - ./html/key.key:/etc/ssl/private/key.key
-      - ./html/000-default.conf:/etc/apache2/sites-available/000-default.conf
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    links:
-      - mysql
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: root
-      PMA_PASSWORD: admin
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 1
-    restart: unless-stopped
-    ports:
-      - 8081:80
+      ADMIN_FOLDER: ${ADMIN_FOLDER:-admin-dev}
+      ADMIN_MAIL: ${ADMIN_MAIL:-demo@prestashop.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-prestashop_demo}
+    networks:
+      - admin-mysql_default
+  memcached:
+    image: memcached
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 2
+        window: 140s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    networks:
+      - admin-mysql_default
+networks:
+  admin-mysql_default:
+    external: true
